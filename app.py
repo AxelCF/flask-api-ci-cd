@@ -2,10 +2,9 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import os
 
-
 app = Flask(__name__)
 
-if os.getenv("CI") == "true":
+if os.getenv("CI") == "true" or os.getenv("AWS_ENV") == "true":
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
 else:
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
@@ -22,12 +21,14 @@ class Task(db.Model):
 with app.app_context():
     db.create_all()
 
+@app.route("/", methods=["GET"])
+def health_check():
+    return "OK", 200
 
 @app.route("/tasks", methods=["GET"])
 def get_tasks():
     tasks = Task.query.all()
     return jsonify([{"id": t.id, "title": t.title, "completed": t.completed} for t in tasks])
-
 
 @app.route("/tasks", methods=["POST"])
 def add_task():
@@ -37,6 +38,6 @@ def add_task():
     db.session.commit()
     return jsonify({"message": "Task added"}), 201
 
-
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)
