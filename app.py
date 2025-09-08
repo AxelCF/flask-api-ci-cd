@@ -13,7 +13,8 @@ class Task(db.Model):
     completed = db.Column(db.Boolean, default=False)
 
 
-db.create_all()
+with app.app_context():
+    db.create_all()
 
 
 @app.route("/tasks", methods=["GET"])
