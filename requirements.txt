@@ -1,4 +1,4 @@
-flask
-flask_sqlalchemy
-psycopg2
-pytest
+Flask
+Flask-SQLAlchemy
+prometheus-flask-exporter
+psycopg2-binary
